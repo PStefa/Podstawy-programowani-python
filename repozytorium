@@ -1,0 +1,26 @@
+# -*- coding: utf-8 -*-
+
+import sqlite3
+
+
+db_path = 'portfel.db'
+conn = sqlite3.connect(db_path)
+
+c = conn.cursor()
+
+c.execute('''
+          CREATE TABLE Portfel
+          ( id INTEGER PRIMARY KEY,
+            Data NUMERIC NOT NULL,
+            Wartosc NUMERIC NOT NULL
+          )
+          ''')
+c.execute('''
+          CREATE TABLE Akcje
+          ( Spolka VARCHAR(100),
+            Wartosc NUMERIC NOT NULL,
+            Ilosc INTEGER NOT NULL,
+            invoice_id INTEGER,
+           FOREIGN KEY(invoice_id) REFERENCES Portfel(id),
+           PRIMARY KEY (Spolka, invoice_id))
+          ''')
