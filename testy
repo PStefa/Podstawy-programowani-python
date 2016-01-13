@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+
+import projekt
+import sqlite3
+import unittest
+
+db_path = 'portfel.db'
+
+class RepositoryTest(unittest.TestCase):
+
+    def setUp(self):
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute('DELETE FROM Akcje')
+        c.execute('DELETE FROM Portfel')
+        c.execute('''INSERT INTO Portfel (id, Data, Wartosc) VALUES(1, '2016-01-01', 30)''')
+        c.execute('''INSERT INTO Akcje (Spolka, Wartosc, Ilosc, invoice_id) VALUES('LOTOS',80.50,400,1)''')
+        c.execute('''INSERT INTO Akcje (Spolka, Wartosc, Ilosc, invoice_id) VALUES('Bogdanka',14.60,250,1)''')
+        conn.commit()
+        conn.close()
+
+    def tearDown(self):
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute('DELETE FROM Akcje')
+        c.execute('DELETE FROM Portfel')
+        conn.commit()
+        conn.close()
+
+    def testGetByIdInstance(self):
+        invoice = projekt.InvoiceRepository().getById(1)
+        self.assertIsInstance(invoice, projekt.Portfel, "Objekt nie jest klasy Invoice")
+
+    def testGetByIdNotFound(self):
+        self.assertEqual(projekt.InvoiceRepository().getById(22),
+                None, "Powinno wyjść None")
+
+    def testGetByIdInvitemsLen(self):
+        self.assertEqual(len(projekt.InvoiceRepository().getById(1).invitems),
+                2, "Powinno wyjść 2")
+
+    def testDeleteNotFound(self):
+        self.assertRaises(projekt.RepositoryException,
+                projekt.InvoiceRepository().delete, 22)
+
+
+
+if __name__ == "__main__":
+    unittest.main()
